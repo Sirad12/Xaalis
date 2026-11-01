@@ -171,7 +171,7 @@ function showEmpty() {
   const u = UI[S.mod], body = el('div', { class: 'tag-body' });
   body.append(el('p', { class: 'tag-k' }, u.out), el('p', { class: 'tag-empty' }, 'Renseignez la fiche, puis cliquez sur Prédire.'));
   $('#tagHost').replaceChildren(el('div', { class: 'tag', id: 'tag' }, stringSvg(), el('div', { class: 'hole' }), body));
-  $('#tagCap').textContent = u.cap; $('#dock').textContent = 'Estimation : cliquez sur Prédire';
+  $('#tagCap').textContent = u.cap; 
   hasResult = false; lastKey = '';
 }
 /* La fiche a changé après une prédiction : on grise l'étiquette jusqu'au prochain clic */
@@ -182,12 +182,11 @@ function touch() {
 function compute() {
   const k = S.mod, u = UI[k], host = $('#tagHost'), { raw, warn } = inputsOf(k); countFrom = null;
   $('#tagCap').textContent = u.cap; hasResult = false;
-  const dock = $('#dock');
   const body = el('div', { class: 'tag-body' });
   const tag = el('div', { class: 'tag', id: 'tag' }, stringSvg(), el('div', { class: 'hole' }), body);
   if (!raw) {
     body.append(el('p', { class: 'tag-k' }, u.out), el('p', { class: 'tag-empty' }, 'Complétez tous les champs pour obtenir une estimation.'));
-    host.replaceChildren(tag); dock.textContent = 'Complétez les champs'; lastKey = ''; return;
+    host.replaceChildren(tag); lastKey = ''; return;
   }
   const r = Engine.predict(getModel(k), raw);
   let seed, summary;
@@ -209,7 +208,7 @@ function compute() {
   }
   body.append(barcode(seed), el('div', { class: 'tag-foot' }, el('span', {}, 'XAALIS · ' + u.file.replace('.csv', '').toUpperCase()), el('span', {}, 'RF/' + PACK.meta[k].nTrees)));
   if (warn.length) body.append(el('p', { class: 'tag-warn' }, 'Valeur hors de la plage connue : ' + warn.join(', ') + '. Estimation peu fiable.'));
-  host.replaceChildren(tag); dock.textContent = u.out + ' : ' + summary; hasResult = true;
+  host.replaceChildren(tag); hasResult = true;
   if (countFrom) { const n = $('#val'); if (n) { if (lastKey !== k) shownVal = countFrom.to; countTo(n, countFrom.to, countFrom.render); } countFrom = null; }
   if (!reduce) tag.classList.add('swing');
   lastKey = k;
@@ -328,7 +327,6 @@ function setMode(m) {
 $('#fields').addEventListener('submit', (e) => { e.preventDefault(); compute(); });
 $('#m-single').addEventListener('click', () => setMode('single'));
 $('#m-batch').addEventListener('click', () => setMode('batch'));
-$('#dock').addEventListener('click', () => $('#tagHost').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }));
 const fromHash = () => { const h = location.hash.slice(1), k = KEYS.find(x => UI[x].hash === h); return k; };
 addEventListener('hashchange', () => { const k = fromHash(); if (k && k !== S.mod) go(k, true); });
 renderStalls(); go(fromHash() || 'telephone', true);
