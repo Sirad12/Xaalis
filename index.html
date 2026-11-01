@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xaalis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>
+  /* thème choisi avant l'affichage : pas de flash en mode sombre */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('xaalis-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="#telephone" aria-label="Xaalis, accueil">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 12 12 3h17v26H3z" fill="var(--saffron)"/><circle cx="11" cy="11" r="2.4" fill="var(--ground)"/><path d="M11 11C14 6 18 4 22 6" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M12 22h13M12 18h9" stroke="#2A1C02" stroke-width="2" stroke-linecap="round"/></svg>
+    xaalis
+  </a>
+  <button class="theme" id="themeBtn" type="button" aria-label="Basculer entre thème clair et sombre" aria-pressed="false">
+    <svg class="t-sun" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="3.300" fill="none" stroke="currentColor" stroke-width="1.800"/><path d="M10 2.500v2M10 15.500v2M2.500 10h2M15.500 10h2M4.700 4.700l1.400 1.400M13.900 13.900l1.400 1.400M4.700 15.300l1.400-1.400M13.900 6.100l1.400-1.400" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/></svg>
+    <svg class="t-moon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M16.500 11.600A6.800 6.800 0 0 1 8.400 3.500a6.800 6.800 0 1 0 8.100 8.100Z" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linejoin="round"/></svg>
+  </button>
+</header>
+<div class="zig" aria-hidden="true"></div>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>Combien ça <em>vaut</em> ?</h1>
+    <p>Trois modèles de Random Forest, entraînés sur des annonces de téléphones et de voitures. Renseignez un article, puis cliquez sur Prédire. Un fichier CSV permet d'en estimer des centaines d'un coup.</p>
+  </section>
+
+  <nav class="stalls" role="tablist" aria-label="Jeu de données" id="stalls"></nav>
+
+  <section class="ws" id="ws" aria-live="off">
+    <div class="ws-head">
+      <h3 id="wsTitle"></h3>
+      <div class="seg2" role="tablist" aria-label="Mode de prédiction">
+        <button role="tab" id="m-single" aria-selected="true">Une estimation</button>
+        <button role="tab" id="m-batch" aria-selected="false">Plusieurs, via un CSV</button>
+      </div>
+    </div>
+    <div class="single" id="single">
+      <form class="fields" id="fields" autocomplete="off"></form>
+      <aside class="tagwrap"><div class="tagstage"><div id="tagHost"></div><p class="tagcap" id="tagCap"></p></div></aside>
+    </div>
+    <div class="batch" id="batch" hidden></div>
+  </section>
+
+  <dl class="about" id="about"></dl>
+  <div class="foot" aria-hidden="true"></div>
+</main>
+
+<button class="dock" id="dock" type="button" aria-label="Voir l'estimation"></button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="models.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
