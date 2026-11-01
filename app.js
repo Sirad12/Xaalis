@@ -11,8 +11,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const UI = {
   telephone: {
     hash: 'telephone', name: 'Téléphones', file: 'Telephone_data.csv', blurb: "Neuf, d'occasion, réconditionné ou venant ?",
-    title: "L'état d'un téléphone", model: 'Random Forest', depth: 12, n: 3253, train: 2602,
-    metric: ['Fiabilité', '88,96 %', 'de bonnes réponses sur le jeu de validation (accuracy et F1-score : 0,8896)'],
+    title: "L'état d'un téléphone", model: 'Random Forest', noun: 'annonce',
     glyph: '<svg class="gl" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="16" height="28" rx="4"/><path d="M15 27h4"/><path d="M13 8h8"/></svg>',
     out: 'État estimé', predCol: 'etat_predit',
     fields: { prix: { label: 'Prix annoncé', unit: 'FCFA', step: 10000 }, adresse: { label: 'Quartier', wide: true }, marque: { label: 'Marque', wide: true }, dim_ecr: { label: "Taille d'écran", unit: 'pouces', step: 0.1, dec: 1 }, ram: { label: 'Mémoire RAM', unit: 'Go', step: 1 }, stockage: { label: 'Stockage', unit: 'Go', step: 32 } },
@@ -20,24 +19,31 @@ const UI = {
     cap: "Le modèle compare votre téléphone aux annonces qu'il a apprises et retient l'état le plus probable. Les barres donnent la probabilité de chaque état."
   },
   cardata: {
-    hash: 'voitures-dakar', name: 'Voitures de Dakar', file: 'Car_Data.csv', blurb: 'Quel prix pour cette voiture ?',
-    title: "Le prix d'une voiture à Dakar", model: 'Random Forest', depth: 10, n: 5507, train: 4405,
-    metric: ['Fiabilité', 'R² 0,768', 'sur le jeu de validation · erreur moyenne (MAE) 1 700 600 FCFA · RMSE 2 544 318 FCFA'],
+    hash: 'voitures-dakar', name: 'Voitures de Dakar', file: 'Car_Data.csv', blurb: "Venant ou d'occasion ?",
+    title: "L'origine d'une voiture à Dakar", model: 'Random Forest', noun: 'annonce',
     glyph: '<svg class="gl" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22v-5l3-7h18l3 7v5"/><path d="M3 22h28v4H3z"/><circle cx="10" cy="22" r="1" fill="currentColor"/><circle cx="24" cy="22" r="1" fill="currentColor"/><path d="M9 14h16"/></svg>',
-    out: 'Prix estimé', unit: 'FCFA', round: 1000, predCol: 'Prix_predit',
-    fields: { Marque: { label: 'Marque', wide: true }, Année: { label: 'Année', step: 1 }, Boite_Vitesse: { label: 'Boîte de vitesse', wide: true }, Adresse: { label: 'Quartier', wide: true }, Venant_Occasion: { label: 'Statut', wide: true } },
-    order: ['Marque', 'Année', 'Boite_Vitesse', 'Adresse', 'Venant_Occasion'],
-    cap: "Le prix est la moyenne des estimations de 70 arbres de décision. La barre montre où se situent 80 % d'entre eux."
+    out: 'Origine estimée', predCol: 'Venant_Occasion_predit',
+    fields: { Marque: { label: 'Marque', wide: true }, Année: { label: 'Année', step: 1 }, Boite_Vitesse: { label: 'Boîte de vitesse', wide: true }, Adresse: { label: 'Quartier', wide: true }, Prix: { label: 'Prix annoncé', unit: 'FCFA', step: 500000 } },
+    order: ['Marque', 'Année', 'Boite_Vitesse', 'Adresse', 'Prix'],
+    cap: "Le modèle compare votre voiture aux annonces qu'il a apprises et retient l'origine la plus probable : venant ou d'occasion. Les barres donnent la probabilité de chaque réponse."
   },
   cardataset: {
     hash: 'revente-voitures', name: 'Revente de voitures', file: 'Car_dataset.csv', blurb: 'Prix de revente selon le kilométrage et l\'âge.',
-    title: "Le prix de revente d'une voiture", model: 'Random Forest', depth: 14, n: 5861, train: 4688,
-    metric: ['Fiabilité', 'R² 0,881', 'sur le jeu de validation · erreur moyenne (MAE) 0,946 · RMSE 1,265'],
+    title: "Le prix de revente d'une voiture", model: 'Random Forest', noun: 'annonce', mdec: 3,
     glyph: '<svg class="gl" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 25a11 11 0 1 1 22 0"/><path d="M17 25l5-8"/><path d="M9 25h2M23 25h2M17 14v2"/></svg>',
     out: 'Prix de revente estimé', unit: 'unités', dec: 2, predCol: 'Selling_Price_predit',
     fields: { Kms_Driven: { label: 'Kilométrage', unit: 'km', step: 5000 }, Present_Price: { label: 'Prix neuf actuel', unit: 'unités', step: 0.5, dec: 2 }, Fuel_Type: { label: 'Carburant', wide: true }, Seller_Type: { label: 'Vendeur', wide: true }, Transmission: { label: 'Transmission', wide: true }, Age: { label: 'Âge', unit: 'ans', step: 1 } },
     order: ['Present_Price', 'Kms_Driven', 'Age', 'Fuel_Type', 'Seller_Type', 'Transmission'],
     cap: "Les prix sont exprimés dans l'unité du jeu de données d'origine, la même que « Prix neuf actuel »."
+  },
+  taxi: {
+    hash: 'taxi', name: 'Courses de taxi', file: 'taxi_trip_pricing.csv', blurb: 'Combien coûte cette course ?',
+    title: "Le prix d'une course de taxi", model: 'Random Forest', noun: 'trajet', mdec: 2, munit: ' $',
+    glyph: '<svg class="gl" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v5h-6z"/><path d="M5 26v-8l3-7h18l3 7v8z"/><path d="M5 18h24"/><circle cx="11" cy="26" r="2" fill="currentColor"/><circle cx="23" cy="26" r="2" fill="currentColor"/></svg>',
+    out: 'Prix de la course estimé', unit: '$', dec: 2, predCol: 'Trip_Price_predit',
+    fields: { Trip_Distance_km: { label: 'Distance', unit: 'km', step: 1, dec: 1 }, Time_of_Day: { label: 'Moment de la journée', wide: true }, Day_of_Week: { label: 'Jour', wide: true }, Passenger_Count: { label: 'Passagers', step: 1 }, Traffic_Conditions: { label: 'Circulation', wide: true }, Weather: { label: 'Météo', wide: true }, Base_Fare: { label: 'Tarif de base', unit: '$', step: 0.5, dec: 2 }, Per_Km_Rate: { label: 'Tarif au km', unit: '$/km', step: 0.05, dec: 2 }, Per_Minute_Rate: { label: 'Tarif à la minute', unit: '$/min', step: 0.01, dec: 2 }, Trip_Duration_Minutes: { label: 'Durée', unit: 'min', step: 5, dec: 1 } },
+    order: ['Trip_Distance_km', 'Trip_Duration_Minutes', 'Time_of_Day', 'Day_of_Week', 'Traffic_Conditions', 'Weather', 'Passenger_Count', 'Base_Fare', 'Per_Km_Rate', 'Per_Minute_Rate'],
+    cap: "Le prix est la moyenne des estimations des arbres de décision. La barre montre où se situent 80 % d'entre eux. Les prix sont exprimés dans l'unité du jeu de données d'origine."
   }
 };
 const KEYS = Object.keys(UI);
@@ -104,7 +110,7 @@ function comboField(f, k) {
   const build = (q) => {
     const s = strip(q || ''); shown = f.options.filter(o => !s || strip(optLabel(f, o)).includes(s)); list.replaceChildren();
     if (!shown.length) list.append(el('li', { class: 'empty' }, 'Aucun résultat'));
-    shown.forEach((o, i) => list.append(el('li', { role: 'option', class: o.code === S.vals[k][f.name] ? 'on' : '', 'aria-selected': String(i === act), onmousedown: (e) => { e.preventDefault(); pick(o); } }, el('span', {}, optLabel(f, o)), el('small', {}, fmt(o.n) + (o.n > 1 ? ' annonces' : ' annonce')))));
+    shown.forEach((o, i) => list.append(el('li', { role: 'option', class: o.code === S.vals[k][f.name] ? 'on' : '', 'aria-selected': String(i === act), onmousedown: (e) => { e.preventDefault(); pick(o); } }, el('span', {}, optLabel(f, o)), el('small', {}, fmt(o.n) + (o.n > 1 ? ' ' + UI[k].noun + 's' : ' ' + UI[k].noun)))));
   };
   const open = (q) => {
     act = -1; build(q); list.classList.remove('up'); list.hidden = false; input.setAttribute('aria-expanded', 'true');
@@ -304,11 +310,16 @@ function renderBatch() {
   if (b.out.length > 300) host.append(el('p', { class: 'hint' }, `Aperçu des 300 premières lignes sur ${fmt(b.out.length)}. Le fichier téléchargé contient tout.`));
 }
 
-/* À propos du modèle */
+/* À propos du modèle : tous les chiffres viennent du pack exporté (nombre d'arbres, profondeur, lignes du CSV, jeux d'entraînement et de validation, métriques recalculées avec le modèle sauvegardé) */
+function metric(m, u) {
+  const s = m.stats, d = u.mdec ?? 3, mu = u.munit ?? '';
+  if (m.classes) return [fmt(s.acc_val * 100, 2) + ' %', `de bonnes réponses sur le jeu de validation (${fmt(s.val)} ${u.noun}s) · accuracy et F1-score : ${fmt(s.acc_val, 4)}`];
+  return ['R² ' + fmt(s.r2, 3), `sur le jeu de validation (${fmt(s.val)} ${u.noun}s) · erreur moyenne (MAE) ${fmt(s.mae, d)}${mu} · RMSE ${fmt(s.rmse, d)}${mu}`];
+}
 function renderAbout() {
   const k = S.mod, u = UI[k], m = PACK.meta[k], d = $('#about'); d.replaceChildren();
   const item = (t, v, s) => el('div', {}, el('dt', {}, t), el('dd', {}, v, s ? el('small', {}, s) : ''));
-  d.append(item('Modèle', u.model, `${m.nTrees} arbres, profondeur ${u.depth}`), item('Données', fmt(u.n) + ' annonces', `${u.file} · ${fmt(u.train)} pour l'entraînement`), item('Variables', String(m.feats.length), m.feats.map(f => f.name).join(', ')), item(u.metric[0], u.metric[1], u.metric[2]));
+  d.append(item('Modèle', u.model, `${m.nTrees} arbres, profondeur ${m.stats.depth}`), item('Données', fmt(m.stats.rows) + ' ' + u.noun + 's', `${u.file} · ${fmt(m.stats.train)} pour l'entraînement`), item('Variables', String(m.feats.length), m.feats.map(f => f.name).join(', ')), item('Fiabilité', ...metric(m, u)));
 }
 
 /* Navigation */
