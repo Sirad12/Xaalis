@@ -1,4 +1,4 @@
-(() => {
+ (() => {
 'use strict';
 const PACK = window.PACK;
 const $ = (s, r = document) => r.querySelector(s);
@@ -23,8 +23,8 @@ const UI = {
     title: "L'origine d'une voiture à Dakar", model: 'Random Forest', noun: 'annonce',
     glyph: '<svg class="gl" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22v-5l3-7h18l3 7v5"/><path d="M3 22h28v4H3z"/><circle cx="10" cy="22" r="1" fill="currentColor"/><circle cx="24" cy="22" r="1" fill="currentColor"/><path d="M9 14h16"/></svg>',
     out: 'Origine estimée', predCol: 'Venant_Occasion_predit',
-    fields: { Marque: { label: 'Marque', wide: true }, Année: { label: 'Année', step: 1 }, Boite_Vitesse: { label: 'Boîte de vitesse', wide: true }, Adresse: { label: 'Quartier', wide: true }, Prix: { label: 'Prix annoncé', unit: 'FCFA', step: 500000 } },
-    order: ['Marque', 'Année', 'Boite_Vitesse', 'Adresse', 'Prix'],
+    fields: { Marque: { label: 'Marque', wide: true }, Année: { label: 'Année', step: 1 }, Boite_Vitesse: { label: 'Boîte de vitesse', wide: true }, Quartier: { label: 'Quartier', wide: true }, Prix: { label: 'Prix annoncé', unit: 'FCFA', step: 500000 } },
+    order: ['Marque', 'Année', 'Boite_Vitesse', 'Quartier', 'Prix'],
     cap: "Le modèle compare votre voiture aux annonces qu'il a apprises et retient l'origine la plus probable : venant ou d'occasion. Les barres donnent la probabilité de chaque réponse."
   },
   cardataset: {
@@ -237,14 +237,14 @@ function runBatch(k, text, name, size) {
   const u = UI[k], m = PACK.meta[k], { rows, sep } = parseCSV(text);
   if (rows.length < 2) { S.batch[k] = { size, name, error: 'Le fichier est vide ou ne contient que des en-têtes.' }; renderBatch(); return; }
   const head = rows[0].map(h => h.trim()), idx = {}, missing = [];
-  m.feats.forEach(f => { const j = head.findIndex(h => strip(h) === strip(f.name)); if (j < 0) missing.push(f.name); else idx[f.name] = j; });
+  m.feats.forEach(f => { const j = head.findIndex(h => strip(h) === strip(f.name) || (f.name === 'Quartier' && strip(h) === 'adresse')); if (j < 0) missing.push(f.name); else idx[f.name] = j; });
   if (missing.length) { S.batch[k] = { size, error: `Colonnes manquantes : ${missing.join(', ')}. Colonnes attendues : ${m.feats.map(f => f.name).join(', ')}.`, name }; renderBatch(); return; }
   const model = getModel(k), out = []; let bad = 0;
   rows.slice(1).forEach((r, n) => {
     const raw = []; let err = '';
     for (const f of m.feats) { const s = (r[idx[f.name]] ?? '').trim();
       if (f.type === 'num') { const t = s.replace(/\s/g, ''), v = Number(sep === ';' ? t.replace(',', '.') : t); if (s === '' || Number.isNaN(v)) { err = `${f.name} : nombre attendu, reçu « ${s} »`; break; } raw.push(v); }
-      else { const c = f.alias[strip(s).replace(/\s*,\s*/g, ',')] ?? f.alias[strip(s)]; if (c === undefined) { err = `${f.name} : valeur inconnue « ${s} »`; break; } raw.push(c); } }
+      else { const q = f.name === 'Quartier' ? s.split(',')[0] : s, c = f.alias[strip(q).replace(/\s*,\s*/g, ',')] ?? f.alias[strip(q)]; if (c === undefined) { err = `${f.name} : valeur inconnue « ${s} »`; break; } raw.push(c); } }
     if (err) { bad++; out.push({ r, err }); } else out.push({ r, res: Engine.predict(model, raw) });
   });
   S.batch[k] = { head, idx, out, bad, name, sep, size: size ?? text.length };
